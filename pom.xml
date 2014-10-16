@@ -32,4 +32,16 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+    <build><plugins>
+        <plugin>
+            <groupId>org.eluder.coveralls</groupId>
+            <artifactId>coveralls-maven-plugin</artifactId>
+            <version>3.0.1</version>
+            <configuration>
+                <repoToken>v6Znxg1mUX2hFfsQMf69Yb39BNLdiNG3B</repoToken>
+            </configuration>
+        </plugin>
+    </plugins></build>
+
 </project>
