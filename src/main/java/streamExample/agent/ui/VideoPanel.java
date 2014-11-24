@@ -10,10 +10,6 @@ import java.util.concurrent.Executors;
 
 
 public class VideoPanel extends JPanel {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -7292145875292244144L;
 
 	protected BufferedImage image;
