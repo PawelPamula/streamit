@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import java.awt.*;
 import java.net.InetSocketAddress;
+import streamExample.agent.ui.StreamServerDisplayWindow;
 
 
 public class StreamServer {
@@ -33,11 +34,12 @@ public class StreamServer {
         logger.debug("Webcam found");
 //        Dimension dimension = webcam.getViewSize();
         Dimension dimension = new Dimension(320, 240);
-        JFrame window = new JFrame("Streamit Server");
-        window.setResizable(true);
-        window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+//        JFrame window = new JFrame("Streamit Server");
+        StreamServerDisplayWindow displayWindow = new StreamServerDisplayWindow("Streamit Server Window", dimension);
+//        window.setResizable(true);
+//        window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         if (webcam == null) {
-            JOptionPane.showMessageDialog(window, "No webcam detected", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(displayWindow.getDisplayFrame(), "No webcam detected", "Error", JOptionPane.ERROR_MESSAGE);
             System.exit(-1);
         } else {
             webcam.setViewSize(dimension);
@@ -47,9 +49,11 @@ public class StreamServer {
             panel.setDisplayDebugInfo(true);
             panel.setImageSizeDisplayed(true);
 
-            window.add(panel);
-            window.pack();
-            window.setVisible(true);
+            displayWindow.setWebCamPanel(panel);
+//            window.add(panel);
+//            window.pack();
+//            window.setVisible(true);
+            displayWindow.setVisible(true);
 
             StreamServerAgent serverAgent = new StreamServerAgent(webcam, dimension);
             serverAgent.start(new InetSocketAddress(HOSTNAME, PORT));
