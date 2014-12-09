@@ -34,7 +34,7 @@ public class StreamServer {
         logger.debug("Webcam found");
 //        Dimension dimension = webcam.getViewSize();
         Dimension dimension = new Dimension(320, 240);
-//        JFrame window = new JFrame("Streamit Server");
+//        JFrame displayWindow = new JFrame("Streamit Server");
 //        StreamServerDisplayWindow displayWindow = new StreamServerDisplayWindow("Streamit Server Window", dimension);
         StreamServerWindow displayWindow = new StreamServerWindow();
 //        window.setResizable(true);
@@ -51,9 +51,9 @@ public class StreamServer {
             panel.setImageSizeDisplayed(true);
 
             displayWindow.setWebCamPanel(panel);
-//            window.add(panel);
-//            window.pack();
-//            window.setVisible(true);
+//            displayWindow.add(panel);
+//            displayWindow.pack();
+//            displayWindow.setVisible(true);
 //            displayWindow.setVisible(true);
 
             StreamServerAgent serverAgent = new StreamServerAgent(webcam, dimension);
