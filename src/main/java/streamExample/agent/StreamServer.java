@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import java.awt.*;
 import java.net.InetSocketAddress;
-import streamExample.agent.ui.StreamServerDisplayWindow;
+import streamExample.agent.ui.StreamServerWindow;
 
 
 public class StreamServer {
@@ -35,11 +35,12 @@ public class StreamServer {
 //        Dimension dimension = webcam.getViewSize();
         Dimension dimension = new Dimension(320, 240);
 //        JFrame window = new JFrame("Streamit Server");
-        StreamServerDisplayWindow displayWindow = new StreamServerDisplayWindow("Streamit Server Window", dimension);
+//        StreamServerDisplayWindow displayWindow = new StreamServerDisplayWindow("Streamit Server Window", dimension);
+        StreamServerWindow displayWindow = new StreamServerWindow();
 //        window.setResizable(true);
 //        window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         if (webcam == null) {
-            JOptionPane.showMessageDialog(displayWindow.getDisplayFrame(), "No webcam detected", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(displayWindow, "No webcam detected", "Error", JOptionPane.ERROR_MESSAGE);
             System.exit(-1);
         } else {
             webcam.setViewSize(dimension);
@@ -53,7 +54,7 @@ public class StreamServer {
 //            window.add(panel);
 //            window.pack();
 //            window.setVisible(true);
-            displayWindow.setVisible(true);
+//            displayWindow.setVisible(true);
 
             StreamServerAgent serverAgent = new StreamServerAgent(webcam, dimension);
             serverAgent.start(new InetSocketAddress(HOSTNAME, PORT));
