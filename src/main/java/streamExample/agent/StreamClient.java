@@ -9,11 +9,10 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.net.InetSocketAddress;
 
-public class StreamClient implements StreamClientAgent.OnConnectListener {
+public class StreamClient {
 	protected final static Logger logger = LoggerFactory.getLogger(StreamClient.class);
 	private final Dimension startDimension = new Dimension(320,240);
 	private StreamClientWindow displayWindow;
-	private StreamServer serverInstance;
 	private static InetSocketAddress streamServerAddress;
 
 	public void oldMain(String[] args) {
@@ -21,18 +20,13 @@ public class StreamClient implements StreamClientAgent.OnConnectListener {
 		displayWindow.setVisible(true);
 
 		// todo: add in agent changing dimensions OR create agent after connecting and getting resolution
-		StreamClientAgent clientAgent = new StreamClientAgent(new StreamFrameListenerIMPL() ,startDimension, this);
+		StreamClientAgent clientAgent = new StreamClientAgent(new StreamFrameListenerIMPL() ,startDimension);
 		streamServerAddress = clientAgent.getStreamServerAddress();
 		clientAgent.connect(new InetSocketAddress(StreamServer.HOSTNAME, StreamServer.PORT));
 	}
 
 	public static void main(String[] args) {
 		new StreamClient().oldMain(args);
-	}
-
-	@Override
-	public void onConnected() {
-		serverInstance = new StreamServer();
 	}
 
 	protected class StreamFrameListenerIMPL implements StreamFrameListener {
@@ -47,4 +41,6 @@ public class StreamClient implements StreamClientAgent.OnConnectListener {
 
 		}
 	}
+
+
 }
