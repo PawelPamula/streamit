@@ -13,6 +13,7 @@ public class StreamClient {
     protected final static Logger logger = LoggerFactory.getLogger(StreamClient.class);
 	private final static Dimension startDimension = new Dimension(320,240);
 	private static StreamClientWindow displayWindow;
+	private static InetSocketAddress streamServerAddress;
         
 	public static void main(String[] args) {
 		displayWindow = new StreamClientWindow();
@@ -20,6 +21,7 @@ public class StreamClient {
 
         // todo: add in agent changing dimensions OR create agent after connecting and getting resolution
 		StreamClientAgent clientAgent = new StreamClientAgent(new StreamFrameListenerIMPL() ,startDimension);
+		streamServerAddress = clientAgent.getStreamServerAddress();
 		clientAgent.connect(new InetSocketAddress(StreamServer.HOSTNAME, StreamServer.PORT));
 	}
 
