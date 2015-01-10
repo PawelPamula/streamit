@@ -17,7 +17,7 @@ import java.net.SocketAddress;
 import java.util.concurrent.*;
 
 public class StreamServerAgent implements IStreamServerAgent {
-    protected final static Logger logger = LoggerFactory.getLogger(StreamServer.class);
+    protected final static Logger logger = LoggerFactory.getLogger(StreamServerAgent.class);
 
     protected final ImageSource imageSource;
     protected final Dimension dimension;
@@ -33,18 +33,14 @@ public class StreamServerAgent implements IStreamServerAgent {
 
     public StreamServerAgent(ImageSource imageSource, Dimension dimension) {
         super();
-        // does not work:
-//        FPS = imageSource.getFPS();
         this.imageSource = imageSource;
         this.dimension = dimension;
-        //this.h264StreamEncoder = new H264StreamEncoder(dimension,false);
         this.serverBootstrap = new ServerBootstrap();
         this.serverBootstrap.setFactory(new NioServerSocketChannelFactory(
                 Executors.newCachedThreadPool(),
                 Executors.newCachedThreadPool()));
         this.serverBootstrap.setPipelineFactory(new StreamServerChannelPipelineFactory(
-                new StreamServerListenerIMPL(),
-                dimension));
+                new StreamServerListenerIMPL()));
         this.timeWorker = new ScheduledThreadPoolExecutor(1);
         this.encodeWorker = Executors.newSingleThreadExecutor();
         this.h264StreamEncoder = new H264StreamEncoder(dimension, false);
@@ -81,10 +77,8 @@ public class StreamServerAgent implements IStreamServerAgent {
         @Override
         public void onClientConnectedIn(Channel channel) {
             //here we just start to stream when the first client connected in
-            //
             channelGroup.add(channel);
             if (!isStreaming) {
-                //do some thing
                 Runnable imageGrabTask = new ImageGrabTask();
                 ScheduledFuture<?> imageGrabFuture =
                         timeWorker.scheduleWithFixedDelay(imageGrabTask,
@@ -120,13 +114,6 @@ public class StreamServerAgent implements IStreamServerAgent {
             public void run() {
                 logger.info("image grabed ,count :{}", frameCount++);
                 BufferedImage bufferedImage = imageSource.getImage();
-                /**
-                 * using this when the h264 encoder is added to the pipeline
-                 * */
-                //channelGroup.write(bufferedImage);
-                /**
-                 * using this when the h264 encoder is inside this class
-                 * */
                 encodeWorker.execute(new EncodeTask(bufferedImage));
             }
 
