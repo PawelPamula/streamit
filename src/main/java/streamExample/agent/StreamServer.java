@@ -4,6 +4,7 @@ import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamPanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import streamExample.agent.ui.WebcamImageSource;
 import streamExample.agent.ui.server.StreamServerWindow;
 
 import javax.swing.*;
@@ -60,7 +61,7 @@ public class StreamServer {
 //            displayWindow.setVisible(true);
 //            displayWindow.setVisible(true);
 
-            StreamServerAgent serverAgent = new StreamServerAgent(webcam, dimension);
+            StreamServerAgent serverAgent = new StreamServerAgent(new WebcamImageSource(webcam), dimension);
             serverAgent.start(new InetSocketAddress(HOSTNAME, PORT));
         }
 	}

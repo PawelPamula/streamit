@@ -10,6 +10,7 @@ import streamExample.handler.StreamClientListener;
 import streamExample.handler.StreamFrameListener;
 
 import java.awt.*;
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.concurrent.Executors;
 
@@ -43,6 +44,10 @@ public class StreamClientAgent implements IStreamClientAgent {
                         streamFrameListener,
                         dimension)
         );
+    }
+
+    public InetSocketAddress getStreamServerAddress() {
+        return null;
     }
 
     @Override

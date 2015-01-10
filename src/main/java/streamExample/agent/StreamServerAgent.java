@@ -1,6 +1,5 @@
 package streamExample.agent;
 
-import com.github.sarxos.webcam.Webcam;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.group.ChannelGroup;
@@ -20,7 +19,7 @@ import java.util.concurrent.*;
 public class StreamServerAgent implements IStreamServerAgent {
     protected final static Logger logger = LoggerFactory.getLogger(StreamServer.class);
 
-    protected final Webcam webcam;
+    protected final ImageSource imageSource;
     protected final Dimension dimension;
     protected final ChannelGroup channelGroup = new DefaultChannelGroup();
     protected final ServerBootstrap serverBootstrap;
@@ -32,11 +31,11 @@ public class StreamServerAgent implements IStreamServerAgent {
     protected double FPS = 25;
     protected ScheduledFuture<?> imageGrabTaskFuture;
 
-    public StreamServerAgent(Webcam webcam, Dimension dimension) {
+    public StreamServerAgent(ImageSource imageSource, Dimension dimension) {
         super();
         // does not work:
-//        FPS = webcam.getFPS();
-        this.webcam = webcam;
+//        FPS = imageSource.getFPS();
+        this.imageSource = imageSource;
         this.dimension = dimension;
         //this.h264StreamEncoder = new H264StreamEncoder(dimension,false);
         this.serverBootstrap = new ServerBootstrap();
@@ -103,12 +102,6 @@ public class StreamServerAgent implements IStreamServerAgent {
             channelGroup.remove(channel);
             int size = channelGroup.size();
             logger.info("current connected clients :{}", size);
-            if (size == 1) {
-                //cancel the task
-                imageGrabTaskFuture.cancel(false);
-                webcam.close();
-                isStreaming = false;
-            }
         }
 
         @Override
@@ -117,14 +110,6 @@ public class StreamServerAgent implements IStreamServerAgent {
             channel.close();
             int size = channelGroup.size();
             logger.info("current connected clients :{}", size);
-            if (size == 1) {
-                //cancel the task
-                imageGrabTaskFuture.cancel(false);
-                webcam.close();
-                isStreaming = false;
-
-            }
-
         }
 
         protected volatile long frameCount = 0;
@@ -134,7 +119,7 @@ public class StreamServerAgent implements IStreamServerAgent {
             @Override
             public void run() {
                 logger.info("image grabed ,count :{}", frameCount++);
-                BufferedImage bufferedImage = webcam.getImage();
+                BufferedImage bufferedImage = imageSource.getImage();
                 /**
                  * using this when the h264 encoder is added to the pipeline
                  * */
