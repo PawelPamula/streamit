@@ -21,9 +21,13 @@ public class StreamClient implements StreamClientAgent.OnConnectListener {
 		displayWindow.setVisible(true);
 
         // todo: add in agent changing dimensions OR create agent after connecting and getting resolution
-		StreamClientAgent clientAgent = new StreamClientAgent(new StreamFrameListenerIMPL() ,startDimension);
+		StreamClientAgent clientAgent = new StreamClientAgent(new StreamFrameListenerIMPL() ,startDimension, this);
 		streamServerAddress = clientAgent.getStreamServerAddress();
 		clientAgent.connect(new InetSocketAddress(StreamServer.HOSTNAME, StreamServer.PORT));
+	}
+
+	public static void main(String[] args) {
+		new StreamClient().oldMain(args);
 	}
 
 	@Override
