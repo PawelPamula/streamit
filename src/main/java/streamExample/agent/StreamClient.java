@@ -10,37 +10,39 @@ import java.awt.image.BufferedImage;
 import java.net.InetSocketAddress;
 
 public class StreamClient {
-	protected final static Logger logger = LoggerFactory.getLogger(StreamClient.class);
-	private final Dimension startDimension = new Dimension(320,240);
-	private StreamClientWindow displayWindow;
-	private static InetSocketAddress streamServerAddress;
+    protected final static Logger logger = LoggerFactory.getLogger(StreamClient.class);
+    private final Dimension startDimension = new Dimension(320, 240);
+    private StreamClientWindow displayWindow;
+    private static InetSocketAddress streamServerAddress;
 
-	public void oldMain(String[] args) {
-		displayWindow = new StreamClientWindow();
-		displayWindow.setVisible(true);
+    public void oldMain(String[] args) {
+        displayWindow = new StreamClientWindow();
+        displayWindow.setVisible(true);
 
-		// todo: add in agent changing dimensions OR create agent after connecting and getting resolution
-		StreamClientAgent clientAgent = new StreamClientAgent(new StreamFrameListenerIMPL() ,startDimension);
-		streamServerAddress = clientAgent.getStreamServerAddress();
-		clientAgent.connect(new InetSocketAddress(StreamServer.HOSTNAME, StreamServer.PORT));
-	}
+        // todo: add in agent changing dimensions OR create agent after connecting and getting resolution
+        StreamClientAgent clientAgent = new StreamClientAgent(new StreamFrameListenerIMPL(), startDimension);
+        streamServerAddress = clientAgent.getStreamServerAddress();
+        if (args.length > 0)
+            clientAgent.connect(new InetSocketAddress(StreamServer.HOSTNAME, Integer.parseInt(args[0])));
+        else
+            clientAgent.connect(new InetSocketAddress(StreamServer.HOSTNAME, StreamServer.PORT));
+    }
 
-	public static void main(String[] args) {
-		new StreamClient().oldMain(args);
-	}
+    public static void main(String[] args) {
+        new StreamClient().oldMain(args);
+    }
 
-	protected class StreamFrameListenerIMPL implements StreamFrameListener {
-		private volatile long count = 0;
-		@Override
-		public void onFrameReceived(BufferedImage image) {
-			displayWindow.updateImage(image);
-		}
+    protected class StreamFrameListenerIMPL implements StreamFrameListener {
+        private volatile long count = 0;
 
-		@Override
-		public void onMsgReceived(Object object) {
+        @Override
+        public void onFrameReceived(BufferedImage image) {
+            displayWindow.updateImage(image);
+        }
 
-		}
-	}
+        @Override
+        public void onMsgReceived(Object object) {
 
-
+        }
+    }
 }
