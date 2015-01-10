@@ -37,7 +37,9 @@ public class ForwarderServerAgent implements IStreamServerAgent {
 
     @Override
     public void stop() {
-
+        logger.info("server is stoping");
+        channelGroup.close();
+        serverBootstrap.releaseExternalResources();
     }
 
     public void forwardImage(Object image) {

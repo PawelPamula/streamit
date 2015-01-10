@@ -11,7 +11,6 @@ import streamExample.handler.StreamClientListener;
 import streamExample.handler.StreamFrameListener;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Random;
@@ -66,6 +65,7 @@ public class StreamClientAgent implements IStreamClientAgent, EncodedFrameListen
     public void stop() {
         clientChannel.close();
         clientBootstrap.releaseExternalResources();
+        forwarderServerAgent.stop();
     }
 
     @Override
