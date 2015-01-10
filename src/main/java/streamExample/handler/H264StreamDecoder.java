@@ -82,9 +82,8 @@ public class H264StreamDecoder extends OneToOneDecoder {
         iStreamCoder.open(null, null);
     }
 
-    @Override
-    protected Object decode(ChannelHandlerContext ctx, Channel channel, final Object msg) throws Exception {
-
+    protected BufferedImage decode(final Object msg) throws Exception {
+        BufferedImage image = null;
         if (decodeWorker != null) {
             decodeWorker.execute(new decodeTask(msg));
             return null;
@@ -130,13 +129,7 @@ public class H264StreamDecoder extends OneToOneDecoder {
                     if (picture.isComplete()) {
                         IConverter converter = ConverterFactory.createConverter(type
                                 .getDescriptor(), picture);
-                        BufferedImage image = converter.toImage(picture);
-                        // BufferedImage convertedImage = ImageUtils.convertToType(image,
-                        // BufferedImage.TYPE_3BYTE_BGR);
-                        // here ,put out the image
-                        if (streamFrameListener != null) {
-                            streamFrameListener.onFrameReceived(image);
-                        }
+                        image = converter.toImage(picture);
                         converter.delete();
                     } else {
                         picture.delete();
@@ -153,8 +146,16 @@ public class H264StreamDecoder extends OneToOneDecoder {
                 iPacket.delete();
                 // ByteBufferUtil.destroy(data);
             }
-            return null;
+            return image;
         }
+    }
+
+    @Override
+    protected Object decode(ChannelHandlerContext ctx, Channel channel, final Object msg) throws Exception {
+        if (streamFrameListener != null) {
+            streamFrameListener.onFrameReceived(decode(msg));
+        }
+        return null;
     }
 
     private class decodeTask implements Runnable {
