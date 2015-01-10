@@ -60,7 +60,9 @@ public class StreamClientAgent implements IStreamClientAgent {
         InetSocketAddress address = null;
         try {
             clientSocket = new Socket(coServerAddress, coServerPort);
+            ObjectOutputStream outToServer = new ObjectOutputStream(clientSocket.getOutputStream());
             ObjectInputStream inFromServer = new ObjectInputStream(clientSocket.getInputStream());
+            outToServer.writeChars("Client connecting");
             address = (InetSocketAddress) inFromServer.readObject();
         } catch (IOException e) {
             e.printStackTrace();
