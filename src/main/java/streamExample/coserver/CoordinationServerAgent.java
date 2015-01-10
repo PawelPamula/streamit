@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 
 public class CoordinationServerAgent
 {
+
     protected final static Logger logger = LoggerFactory.getLogger(CoordinationServerAgent.class);
     private ServerSocket serverSocket = null;
     private final int port;
@@ -38,18 +40,27 @@ public class CoordinationServerAgent
                 clientSocket = serverSocket.accept();
                 logger.debug("Making connection!");
                 ObjectOutputStream outToClient = new ObjectOutputStream(clientSocket.getOutputStream());
+                ObjectInputStream inFromClient = new ObjectInputStream(clientSocket.getInputStream());
+                String message = (String) inFromClient.readObject();
                 InetSocketAddress clientAddress =
                         new InetSocketAddress(clientSocket.getInetAddress(), clientSocket.getPort());
 
-                clients.add(clientAddress);
-                logger.debug(clientAddress.toString());
-                if(clients.size() > 1) {
+                if((clients.size() == 0 && message == CoordinationServer.SERVER_CONNECTING)
+                    || (clients.size()>0 && message == CoordinationServer.CLIENT_CONNECTING))
+                {
+                    clients.add(clientAddress);
+                    logger.debug(clientAddress.toString());
+                }
+
+                if(clients.size() > 1 && message == CoordinationServer.CLIENT_CONNECTING) {
                     InetSocketAddress address = getAddressForChannel();
                     outToClient.writeObject(address);
                 }
 
 
             } catch (IOException e) {
+                logger.debug(e.getMessage() + e.getStackTrace());
+            } catch (ClassNotFoundException e) {
                 logger.debug(e.getMessage() + e.getStackTrace());
             } finally {
                 try {

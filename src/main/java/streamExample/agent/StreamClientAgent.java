@@ -6,6 +6,7 @@ import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import streamExample.channel.StreamClientChannelPipelineFactory;
+import streamExample.coserver.CoordinationServer;
 import streamExample.handler.StreamClientListener;
 import streamExample.handler.StreamFrameListener;
 
@@ -62,7 +63,7 @@ public class StreamClientAgent implements IStreamClientAgent {
             clientSocket = new Socket(coServerAddress, coServerPort);
             ObjectOutputStream outToServer = new ObjectOutputStream(clientSocket.getOutputStream());
             ObjectInputStream inFromServer = new ObjectInputStream(clientSocket.getInputStream());
-            outToServer.writeChars("Client connecting");
+            outToServer.writeChars(CoordinationServer.CLIENT_CONNECTING);
             address = (InetSocketAddress) inFromServer.readObject();
         } catch (IOException e) {
             e.printStackTrace();
