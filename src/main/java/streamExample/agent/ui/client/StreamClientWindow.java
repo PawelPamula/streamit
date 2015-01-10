@@ -1,5 +1,7 @@
-package streamExample.agent.ui;
+package streamExample.agent.ui.client;
 
+
+import streamExample.agent.ui.components.VideoPanel;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -22,7 +24,7 @@ public class StreamClientWindow extends JFrame {
         windowContent = new StreamClientWindowContent();
         videoPanel = new VideoPanel();
         setContentPane(windowContent.mainContentPanel);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         windowContent.addVideoPanel(videoPanel);
         generateConnectionMenu();
         pack();

@@ -1,7 +1,8 @@
-package streamExample.agent.ui;
+package streamExample.agent.ui.server;
 
 
 import com.github.sarxos.webcam.WebcamPanel;
+
 import javax.swing.*;
 
 /**

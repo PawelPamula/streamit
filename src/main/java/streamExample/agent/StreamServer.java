@@ -4,11 +4,11 @@ import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamPanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import streamExample.agent.ui.server.StreamServerWindow;
 
 import javax.swing.*;
 import java.awt.*;
 import java.net.InetSocketAddress;
-import streamExample.agent.ui.StreamServerWindow;
 
 
 public class StreamServer {

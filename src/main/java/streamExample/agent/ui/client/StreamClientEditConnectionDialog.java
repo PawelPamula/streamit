@@ -1,4 +1,4 @@
-package streamExample.agent.ui;
+package streamExample.agent.ui.client;
 
 import javax.swing.*;
 import java.awt.event.*;

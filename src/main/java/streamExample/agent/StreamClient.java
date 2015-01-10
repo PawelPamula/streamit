@@ -2,7 +2,7 @@ package streamExample.agent;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import streamExample.agent.ui.StreamClientWindow;
+import streamExample.agent.ui.client.StreamClientWindow;
 import streamExample.handler.StreamFrameListener;
 
 import java.awt.*;
@@ -12,12 +12,9 @@ import java.net.InetSocketAddress;
 public class StreamClient {
     protected final static Logger logger = LoggerFactory.getLogger(StreamClient.class);
 	private final static Dimension startDimension = new Dimension(320,240);
-//	private static SingleVideoDisplayWindow displayWindow;
-//  private static StreamClientDisplayWindow displayWindow;
 	private static StreamClientWindow displayWindow;
         
 	public static void main(String[] args) {
-//        displayWindow = new SingleVideoDisplayWindow("Istreamit Client", startDimension);
 		displayWindow = new StreamClientWindow();
 		displayWindow.setVisible(true);
 

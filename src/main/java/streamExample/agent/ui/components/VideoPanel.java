@@ -1,4 +1,4 @@
-package streamExample.agent.ui;
+package streamExample.agent.ui.components;
 
 import net.coobird.thumbnailator.makers.ScaledThumbnailMaker;
 
