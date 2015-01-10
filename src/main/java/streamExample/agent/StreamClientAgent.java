@@ -75,8 +75,10 @@ public class StreamClientAgent implements IStreamClientAgent, EncodedFrameListen
             e.printStackTrace();
         } finally {
             try {
-                clientSocket.close();
-            } catch (IOException e) {
+                if (clientSocket != null) {
+                    clientSocket.close();
+                }
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
