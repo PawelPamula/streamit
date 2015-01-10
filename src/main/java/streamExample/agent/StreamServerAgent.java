@@ -36,8 +36,6 @@ public class StreamServerAgent implements IStreamServerAgent {
     protected ExecutorService encodeWorker;
     protected double FPS = 25;
     protected ScheduledFuture<?> imageGrabTaskFuture;
-    protected final String coServerAddress = "localhost";
-    protected final int coServerPort = 20002;
     protected final int streamServerPort;
 
     public StreamServerAgent(ImageSource imageSource, Dimension dimension, int port) {
@@ -69,7 +67,7 @@ public class StreamServerAgent implements IStreamServerAgent {
         Socket clientSocket = null;
         InetSocketAddress address = null;
         try {
-            clientSocket = new Socket(coServerAddress, coServerPort);
+            clientSocket = new Socket(CoordinationServer.COORDINATION_SERVER_HOST, CoordinationServer.COORDINATION_SERVER_PORT);
             ObjectOutputStream outToServer = new ObjectOutputStream(clientSocket.getOutputStream());
             String msgType = CoordinationServer.SERVER_CONNECTING;
             outToServer.writeObject(new HostData(null, streamServerPort, msgType));

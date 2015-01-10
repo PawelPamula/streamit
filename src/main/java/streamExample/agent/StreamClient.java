@@ -20,8 +20,9 @@ public class StreamClient {
         displayWindow.setVisible(true);
 
         // todo: add in agent changing dimensions OR create agent after connecting and getting resolution
-		StreamClientAgent clientAgent = new StreamClientAgent(new StreamFrameListenerIMPL() ,startDimension);
-//		streamServerAddress = clientAgent.getStreamServerAddress();
+		StreamClientAgent clientAgent = new StreamClientAgent(new StreamFrameListenerIMPL(), startDimension);
+		// streamServerAddress = clientAgent.getStreamServerAddress();
+        // TO NIE JEST ADRES POD KTÓRY SIĘ ŁĄCZYMY!
 		clientAgent.connect(new InetSocketAddress(StreamServer.HOSTNAME, StreamServer.PORT));
 	}
 

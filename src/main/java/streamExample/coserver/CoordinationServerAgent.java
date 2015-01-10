@@ -18,19 +18,17 @@ public class CoordinationServerAgent
 
     protected final static Logger logger = LoggerFactory.getLogger(CoordinationServerAgent.class);
     private ServerSocket serverSocket = null;
-    private final int port;
     private Socket clientSocket;
     protected final ArrayList<InetSocketAddress> clients;
 
-    public CoordinationServerAgent(int port) {
-        this.port = port;
+    public CoordinationServerAgent() {
         this.clients = new ArrayList<InetSocketAddress>();
         try {
-            serverSocket = new ServerSocket(port);
+            serverSocket = new ServerSocket(CoordinationServer.COORDINATION_SERVER_PORT);
             logger.debug("Coordination server running..");
             run();
         } catch (IOException e) {
-            logger.debug("Cannot start coordination server! Message: "+e.getMessage());
+            logger.debug("Cannot start coordination server! Message: " + e.getMessage());
         }
 
     }
@@ -39,24 +37,26 @@ public class CoordinationServerAgent
         while(true) {
             try {
                 clientSocket = serverSocket.accept();
-                logger.debug("Incoming connection!");
+                logger.debug("\nIncoming connection!");
                 ObjectOutputStream outToClient = new ObjectOutputStream(clientSocket.getOutputStream());
                 ObjectInputStream inFromClient = new ObjectInputStream(clientSocket.getInputStream());
                 HostData hostData = (HostData) inFromClient.readObject();
                 InetSocketAddress clientAddress =
                         new InetSocketAddress(clientSocket.getInetAddress(), hostData.getPort());
 
+                logger.debug("Connected user: " + clientSocket.getInetAddress() + ":" + hostData.getPort());
 
-                logger.debug("Received message: "+hostData.getType());
+                logger.debug("Received message: " + hostData.getType());
                 if((clients.size() == 0 && hostData.getType().equals(CoordinationServer.SERVER_CONNECTING))
-                    || (clients.size()>0 && hostData.getType().equals(CoordinationServer.CLIENT_CONNECTING)))
+                    || (clients.size() > 0 && hostData.getType().equals(CoordinationServer.CLIENT_CONNECTING)))
                 {
                     clients.add(clientAddress);
-                    logger.debug(clientAddress.toString());
+                    logger.debug("Added " + clientAddress.toString() + " to a list");
                 }
 
                 if(clients.size() > 1 && hostData.getType().equals(CoordinationServer.CLIENT_CONNECTING)) {
                     InetSocketAddress address = getAddressForChannel();
+                    logger.debug("Sending message: " + address.toString());
                     outToClient.writeObject(address);
                 }
 
@@ -77,10 +77,9 @@ public class CoordinationServerAgent
     }
 
     private InetSocketAddress getAddressForChannel() {
-        int index = clients.size()-1;
+        int index = clients.size() - 1;
         index = (index % 2 == 1) ? index/2 : (index-1)/2;
 
         return clients.get(index);
     }
-
 }

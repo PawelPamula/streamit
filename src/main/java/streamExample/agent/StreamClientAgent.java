@@ -16,7 +16,6 @@ import java.awt.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
@@ -32,9 +31,8 @@ public class StreamClientAgent implements IStreamClientAgent, EncodedFrameListen
     protected final Dimension dimension;
     protected Channel clientChannel;
 //    private OnConnectListener callback;
-    protected final String coServerAddress = "localhost";
-    protected final int coServerPort = 20002;
     private ForwarderServerAgent forwarderServerAgent;
+    public int port;
 
     public StreamClientAgent(StreamFrameListener streamFrameListener,
                              Dimension dimension) {
@@ -56,17 +54,20 @@ public class StreamClientAgent implements IStreamClientAgent, EncodedFrameListen
         h264StreamDecoder = new H264StreamDecoder(streamFrameListener, dimension, false, false);
 
         forwarderServerAgent = new ForwarderServerAgent();
+
+        // choose a random port
+        this.port = 1024 + new Random().nextInt(20000);
     }
 
     public InetSocketAddress getStreamServerAddress() {
         Socket clientSocket = null;
         InetSocketAddress address = null;
         try {
-            clientSocket = new Socket(coServerAddress, coServerPort);
+            clientSocket = new Socket(CoordinationServer.COORDINATION_SERVER_HOST, CoordinationServer.COORDINATION_SERVER_PORT);
             ObjectOutputStream outToServer = new ObjectOutputStream(clientSocket.getOutputStream());
             ObjectInputStream inFromServer = new ObjectInputStream(clientSocket.getInputStream());
             String msgType = CoordinationServer.CLIENT_CONNECTING;
-            outToServer.writeObject(new HostData(null, 20001, msgType)); // TODO to change
+            outToServer.writeObject(new HostData(null, this.port, msgType));
             address = (InetSocketAddress) inFromServer.readObject();
         } catch (IOException e) {
             e.printStackTrace();
@@ -79,22 +80,18 @@ public class StreamClientAgent implements IStreamClientAgent, EncodedFrameListen
                 e.printStackTrace();
             }
         }
-
         return address;
     }
 
     @Override
     public void connect(SocketAddress streamServerAddress) {
-        // find address to connect to 
-
+        // find address to connect to
         streamServerAddress = getStreamServerAddress();
-
 
         logger.info("going to connect to stream server :{}", streamServerAddress);
         clientBootstrap.connect(streamServerAddress);
-        int port = 1024 + new Random().nextInt(20000);
-        forwarderServerAgent.start(new InetSocketAddress(port));
-        System.out.println("OUR SERVER PORT IZ " + port + " !!!11!!1111oneoneone");
+        forwarderServerAgent.start(new InetSocketAddress(this.port));
+        System.out.println("OUR SERVER PORT IZ " + this.port + " !!!11!!1111oneoneone");
     }
 
     @Override
