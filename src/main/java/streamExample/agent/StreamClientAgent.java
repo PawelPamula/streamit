@@ -20,10 +20,16 @@ public class StreamClientAgent implements IStreamClientAgent {
     protected final StreamFrameListener streamFrameListener;
     protected final Dimension dimension;
     protected Channel clientChannel;
+    private OnConnectListener callback;
+
+    public interface OnConnectListener {
+        public void onConnected();
+    }
 
     public StreamClientAgent(StreamFrameListener streamFrameListener,
-                             Dimension dimension) {
+                             Dimension dimension, OnConnectListener callback) {
         super();
+        this.callback = callback;
         this.dimension = dimension;
         this.clientBootstrap = new ClientBootstrap();
         this.clientBootstrap.setFactory(new NioClientSocketChannelFactory(

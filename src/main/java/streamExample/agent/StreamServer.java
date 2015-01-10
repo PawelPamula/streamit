@@ -16,7 +16,11 @@ public class StreamServer {
     public static String HOSTNAME = "localhost";
     public static int PORT = 20001;
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
+        new StreamServer().oldMain(args);
+    }
+
+	public void oldMain(String[] args) {
         try {
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
         } catch (ClassNotFoundException e) {

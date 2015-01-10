@@ -9,25 +9,42 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.net.InetSocketAddress;
 
-public class StreamClient {
+public class StreamClient implements StreamClientAgent.OnConnectListener {
     protected final static Logger logger = LoggerFactory.getLogger(StreamClient.class);
-	private final static Dimension startDimension = new Dimension(320,240);
-	private static StreamClientWindow displayWindow;
+	private final Dimension startDimension = new Dimension(320,240);
+	private StreamClientWindow displayWindow;
+	private StreamServer serverInstance;
         
-	public static void main(String[] args) {
+	public void oldMain(String[] args) {
 		displayWindow = new StreamClientWindow();
 		displayWindow.setVisible(true);
+		connectToServer();
+	}
 
-        // todo: add in agent changing dimensions OR create agent after connecting and getting resolution
-		StreamClientAgent clientAgent = new StreamClientAgent(new StreamFrameListenerIMPL() ,startDimension);
+	public static void main(String[] args) {
+		new StreamClient().oldMain(args);
+	}
+
+	private void connectToServer() {
+		StreamClientAgent clientAgent = new StreamClientAgent(new StreamFrameListenerIMPL() ,startDimension, this);
 		clientAgent.connect(new InetSocketAddress(StreamServer.HOSTNAME, StreamServer.PORT));
 	}
 
-	protected static class StreamFrameListenerIMPL implements StreamFrameListener {
+	@Override
+	public void onConnected() {
+		serverInstance = new StreamServer();
+	}
+
+	protected class StreamFrameListenerIMPL implements StreamFrameListener {
 		private volatile long count = 0;
 		@Override
 		public void onFrameReceived(BufferedImage image) {
 			displayWindow.updateImage(image);			
+		}
+
+		@Override
+		public void onMsgReceived(Object object) {
+
 		}
 	}
 }
