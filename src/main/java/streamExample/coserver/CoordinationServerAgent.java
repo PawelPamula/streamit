@@ -24,6 +24,7 @@ public class CoordinationServerAgent
         this.clients = new ArrayList<InetSocketAddress>();
         try {
             serverSocket = new ServerSocket(port);
+            logger.debug("Coordination server running..");
             run();
         } catch (IOException e) {
             logger.debug("Cannot start coordination server! Message: "+e.getMessage());
@@ -38,15 +39,16 @@ public class CoordinationServerAgent
                 logger.debug("Making connection!");
                 ObjectOutputStream outToClient = new ObjectOutputStream(clientSocket.getOutputStream());
                 InetSocketAddress clientAddress =
-                        new InetSocketAddress(clientSocket.getLocalAddress(), clientSocket.getPort());
+                        new InetSocketAddress(clientSocket.getInetAddress(), clientSocket.getPort());
 
                 clients.add(clientAddress);
+                logger.debug(clientAddress.toString());
                 if(clients.size() > 1) {
                     InetSocketAddress address = getAddressForChannel();
                     outToClient.writeObject(address);
                 }
 
-                
+
             } catch (IOException e) {
                 logger.debug(e.getMessage() + e.getStackTrace());
             } finally {
@@ -61,7 +63,7 @@ public class CoordinationServerAgent
     }
 
     private InetSocketAddress getAddressForChannel() {
-        int index = clients.size();
+        int index = clients.size()-1;
         index = (index % 2 == 1) ? index/2 : (index-1)/2;
 
         return clients.get(index);

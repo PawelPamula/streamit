@@ -80,9 +80,9 @@ public class StreamClientAgent implements IStreamClientAgent {
     @Override
     public void connect(SocketAddress streamServerAddress) {
         // find address to connect to 
-        do {
-            streamServerAddress = getStreamServerAddress();
-        } while(streamServerAddress == null);
+
+        streamServerAddress = getStreamServerAddress();
+
 
         logger.info("going to connect to stream server :{}", streamServerAddress);
         clientBootstrap.connect(streamServerAddress);

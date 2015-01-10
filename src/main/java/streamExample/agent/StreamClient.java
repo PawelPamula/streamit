@@ -22,7 +22,7 @@ public class StreamClient implements StreamClientAgent.OnConnectListener {
 
         // todo: add in agent changing dimensions OR create agent after connecting and getting resolution
 		StreamClientAgent clientAgent = new StreamClientAgent(new StreamFrameListenerIMPL() ,startDimension, this);
-		streamServerAddress = clientAgent.getStreamServerAddress();
+//		streamServerAddress = clientAgent.getStreamServerAddress();
 		clientAgent.connect(new InetSocketAddress(StreamServer.HOSTNAME, StreamServer.PORT));
 	}
 
