@@ -103,12 +103,6 @@ public class StreamServerAgent implements IStreamServerAgent {
             channelGroup.remove(channel);
             int size = channelGroup.size();
             logger.info("current connected clients :{}", size);
-            if (size == 1) {
-                //cancel the task
-                imageGrabTaskFuture.cancel(false);
-                webcam.close();
-                isStreaming = false;
-            }
         }
 
         @Override
@@ -117,14 +111,6 @@ public class StreamServerAgent implements IStreamServerAgent {
             channel.close();
             int size = channelGroup.size();
             logger.info("current connected clients :{}", size);
-            if (size == 1) {
-                //cancel the task
-                imageGrabTaskFuture.cancel(false);
-                webcam.close();
-                isStreaming = false;
-
-            }
-
         }
 
         protected volatile long frameCount = 0;
