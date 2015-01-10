@@ -82,7 +82,7 @@ public class H264StreamDecoder extends OneToOneDecoder {
         iStreamCoder.open(null, null);
     }
 
-    protected BufferedImage decode(final Object msg) throws Exception {
+    public BufferedImage decode(final Object msg) throws Exception {
         BufferedImage image = null;
         if (decodeWorker != null) {
             decodeWorker.execute(new decodeTask(msg));

@@ -6,10 +6,12 @@ import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import streamExample.channel.StreamClientChannelPipelineFactory;
+import streamExample.handler.H264StreamDecoder;
 import streamExample.handler.StreamClientListener;
 import streamExample.handler.StreamFrameListener;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.concurrent.Executors;
@@ -19,7 +21,9 @@ public class StreamClientAgent implements IStreamClientAgent {
     protected final ClientBootstrap clientBootstrap;
     protected final StreamClientListener streamClientListener;
     protected final StreamFrameListener streamFrameListener;
+    protected final H264StreamDecoder h264StreamDecoder;
     protected final Dimension dimension;
+    private final EncodedFrameListener encodedFrameListener;
     protected Channel clientChannel;
     private OnConnectListener callback;
 
@@ -37,13 +41,22 @@ public class StreamClientAgent implements IStreamClientAgent {
                 Executors.newCachedThreadPool(),
                 Executors.newCachedThreadPool()));
         this.streamFrameListener = streamFrameListener;
+        this.encodedFrameListener = new EncodedFrameListener() {
+
+            @Override
+            public void receiveEncodedFrame(Object frame) {
+                System.out.println(frame.toString());
+            }
+        };
         this.streamClientListener = new StreamClientListenerIMPL();
         this.clientBootstrap.setPipelineFactory(
                 new StreamClientChannelPipelineFactory(
                         streamClientListener,
                         streamFrameListener,
+                        encodedFrameListener,
                         dimension)
         );
+        h264StreamDecoder = new H264StreamDecoder(streamFrameListener, dimension, false, false);
     }
 
     public InetSocketAddress getStreamServerAddress() {
@@ -54,6 +67,8 @@ public class StreamClientAgent implements IStreamClientAgent {
     public void connect(SocketAddress streamServerAddress) {
         logger.info("going to connect to stream server :{}", streamServerAddress);
         clientBootstrap.connect(streamServerAddress);
+        callback.onConnected();
+
     }
 
     @Override
@@ -79,8 +94,5 @@ public class StreamClientAgent implements IStreamClientAgent {
         public void onException(Channel channel, Throwable t) {
             //	logger.debug("exception at :{},exception :{}",channel,t);
         }
-
-
     }
-
 }
