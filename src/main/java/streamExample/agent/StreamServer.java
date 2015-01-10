@@ -61,7 +61,7 @@ public class StreamServer {
 //            displayWindow.setVisible(true);
 //            displayWindow.setVisible(true);
 
-            StreamServerAgent serverAgent = new StreamServerAgent(new WebcamImageSource(webcam), dimension);
+            StreamServerAgent serverAgent = new StreamServerAgent(new WebcamImageSource(webcam), dimension, PORT);
             serverAgent.start(new InetSocketAddress(HOSTNAME, PORT));
         }
 	}

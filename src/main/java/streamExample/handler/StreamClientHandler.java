@@ -4,6 +4,7 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.helpers.BasicMarker;
 import streamExample.handler.frame.FrameDecoder;
 
 public class StreamClientHandler extends SimpleChannelHandler {
@@ -23,6 +24,7 @@ public class StreamClientHandler extends SimpleChannelHandler {
         Channel channel = e.getChannel();
         Throwable t = e.getCause();
         logger.debug("exception at :{}", channel);
+        t.printStackTrace();
         streamClientListener.onException(channel, t);
         //super.exceptionCaught(ctx, e);
     }

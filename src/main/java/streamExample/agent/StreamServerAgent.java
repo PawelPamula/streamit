@@ -11,6 +11,7 @@ import streamExample.channel.StreamServerChannelPipelineFactory;
 import streamExample.coserver.CoordinationServer;
 import streamExample.handler.H264StreamEncoder;
 import streamExample.handler.StreamServerListener;
+import streamExample.utils.HostData;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -37,8 +38,9 @@ public class StreamServerAgent implements IStreamServerAgent {
     protected ScheduledFuture<?> imageGrabTaskFuture;
     protected final String coServerAddress = "localhost";
     protected final int coServerPort = 20002;
+    protected final int streamServerPort;
 
-    public StreamServerAgent(ImageSource imageSource, Dimension dimension) {
+    public StreamServerAgent(ImageSource imageSource, Dimension dimension, int port) {
         super();
         // does not work:
 //        FPS = imageSource.getFPS();
@@ -55,6 +57,7 @@ public class StreamServerAgent implements IStreamServerAgent {
         this.timeWorker = new ScheduledThreadPoolExecutor(1);
         this.encodeWorker = Executors.newSingleThreadExecutor();
         this.h264StreamEncoder = new H264StreamEncoder(dimension, false);
+        this.streamServerPort = port;
     }
 
 
@@ -72,7 +75,7 @@ public class StreamServerAgent implements IStreamServerAgent {
         try {
             clientSocket = new Socket(coServerAddress, coServerPort);
             ObjectOutputStream outToServer = new ObjectOutputStream(clientSocket.getOutputStream());
-            outToServer.writeChars(CoordinationServer.SERVER_CONNECTING);
+            outToServer.writeObject(new HostData(null, streamServerPort, new String(CoordinationServer.SERVER_CONNECTING)));
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

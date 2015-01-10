@@ -3,6 +3,7 @@ package streamExample.coserver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import streamExample.utils.HostData;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -41,18 +42,20 @@ public class CoordinationServerAgent
                 logger.debug("Making connection!");
                 ObjectOutputStream outToClient = new ObjectOutputStream(clientSocket.getOutputStream());
                 ObjectInputStream inFromClient = new ObjectInputStream(clientSocket.getInputStream());
-                String message = (String) inFromClient.readObject();
+                HostData hostData = (HostData) inFromClient.readObject();
                 InetSocketAddress clientAddress =
-                        new InetSocketAddress(clientSocket.getInetAddress(), clientSocket.getPort());
+                        new InetSocketAddress(clientSocket.getInetAddress(), hostData.getPort());
 
-                if((clients.size() == 0 && message == CoordinationServer.SERVER_CONNECTING)
-                    || (clients.size()>0 && message == CoordinationServer.CLIENT_CONNECTING))
+
+                logger.debug("Received message: "+hostData.getType());
+                if((clients.size() == 0 && hostData.getType().equals(CoordinationServer.SERVER_CONNECTING))
+                    || (clients.size()>0 && hostData.getType().equals(CoordinationServer.CLIENT_CONNECTING)))
                 {
                     clients.add(clientAddress);
                     logger.debug(clientAddress.toString());
                 }
 
-                if(clients.size() > 1 && message == CoordinationServer.CLIENT_CONNECTING) {
+                if(clients.size() > 1 && hostData.getType().equals(CoordinationServer.CLIENT_CONNECTING)) {
                     InetSocketAddress address = getAddressForChannel();
                     outToClient.writeObject(address);
                 }

@@ -9,6 +9,7 @@ import streamExample.channel.StreamClientChannelPipelineFactory;
 import streamExample.coserver.CoordinationServer;
 import streamExample.handler.StreamClientListener;
 import streamExample.handler.StreamFrameListener;
+import streamExample.utils.HostData;
 
 import java.awt.*;
 import java.io.IOException;
@@ -63,7 +64,7 @@ public class StreamClientAgent implements IStreamClientAgent {
             clientSocket = new Socket(coServerAddress, coServerPort);
             ObjectOutputStream outToServer = new ObjectOutputStream(clientSocket.getOutputStream());
             ObjectInputStream inFromServer = new ObjectInputStream(clientSocket.getInputStream());
-            outToServer.writeChars(CoordinationServer.CLIENT_CONNECTING);
+            outToServer.writeObject(new HostData(null, 20001, new String(CoordinationServer.CLIENT_CONNECTING))); // TODO to change
             address = (InetSocketAddress) inFromServer.readObject();
         } catch (IOException e) {
             e.printStackTrace();
