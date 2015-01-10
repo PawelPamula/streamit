@@ -8,13 +8,13 @@ import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import streamExample.channel.StreamServerChannelPipelineFactory;
+import streamExample.coserver.CoordinationServer;
 import streamExample.handler.H264StreamEncoder;
 import streamExample.handler.StreamServerListener;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -72,8 +72,7 @@ public class StreamServerAgent implements IStreamServerAgent {
         try {
             clientSocket = new Socket(coServerAddress, coServerPort);
             ObjectOutputStream outToServer = new ObjectOutputStream(clientSocket.getOutputStream());
-            ObjectInputStream inFromServer = new ObjectInputStream(clientSocket.getInputStream());
-            outToServer.writeChars("Server connecting");
+            outToServer.writeChars(CoordinationServer.SERVER_CONNECTING);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
