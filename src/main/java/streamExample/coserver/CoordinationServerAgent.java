@@ -39,7 +39,7 @@ public class CoordinationServerAgent
         while(true) {
             try {
                 clientSocket = serverSocket.accept();
-                logger.debug("Making connection!");
+                logger.debug("Incoming connection!");
                 ObjectOutputStream outToClient = new ObjectOutputStream(clientSocket.getOutputStream());
                 ObjectInputStream inFromClient = new ObjectInputStream(clientSocket.getInputStream());
                 HostData hostData = (HostData) inFromClient.readObject();

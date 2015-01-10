@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import streamExample.channel.StreamClientChannelPipelineFactory;
 import streamExample.coserver.CoordinationServer;
+import streamExample.handler.H264StreamDecoder;
 import streamExample.handler.StreamClientListener;
 import streamExample.handler.StreamFrameListener;
 import streamExample.utils.HostData;
@@ -19,27 +20,25 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.util.Random;
 import java.util.concurrent.Executors;
 
-public class StreamClientAgent implements IStreamClientAgent {
+public class StreamClientAgent implements IStreamClientAgent, EncodedFrameListener {
     protected final static Logger logger = LoggerFactory.getLogger(StreamClientAgent.class);
     protected final ClientBootstrap clientBootstrap;
-        protected final StreamClientListener streamClientListener;
+    protected final StreamClientListener streamClientListener;
     protected final StreamFrameListener streamFrameListener;
+    protected final H264StreamDecoder h264StreamDecoder;
     protected final Dimension dimension;
     protected Channel clientChannel;
-    private OnConnectListener callback;
+//    private OnConnectListener callback;
     protected final String coServerAddress = "localhost";
     protected final int coServerPort = 20002;
-
-    public interface OnConnectListener {
-        public void onConnected();
-    }
+    private ForwarderServerAgent forwarderServerAgent;
 
     public StreamClientAgent(StreamFrameListener streamFrameListener,
-                             Dimension dimension, OnConnectListener callback) {
+                             Dimension dimension) {
         super();
-        this.callback = callback;
         this.dimension = dimension;
         this.clientBootstrap = new ClientBootstrap();
         this.clientBootstrap.setFactory(new NioClientSocketChannelFactory(
@@ -51,10 +50,12 @@ public class StreamClientAgent implements IStreamClientAgent {
                 new StreamClientChannelPipelineFactory(
                         streamClientListener,
                         streamFrameListener,
+                        this,
                         dimension)
         );
+        h264StreamDecoder = new H264StreamDecoder(streamFrameListener, dimension, false, false);
 
-
+        forwarderServerAgent = new ForwarderServerAgent();
     }
 
     public InetSocketAddress getStreamServerAddress() {
@@ -64,7 +65,8 @@ public class StreamClientAgent implements IStreamClientAgent {
             clientSocket = new Socket(coServerAddress, coServerPort);
             ObjectOutputStream outToServer = new ObjectOutputStream(clientSocket.getOutputStream());
             ObjectInputStream inFromServer = new ObjectInputStream(clientSocket.getInputStream());
-            outToServer.writeObject(new HostData(null, 20001, new String(CoordinationServer.CLIENT_CONNECTING))); // TODO to change
+            String msgType = CoordinationServer.CLIENT_CONNECTING;
+            outToServer.writeObject(new HostData(null, 20001, msgType)); // TODO to change
             address = (InetSocketAddress) inFromServer.readObject();
         } catch (IOException e) {
             e.printStackTrace();
@@ -90,12 +92,21 @@ public class StreamClientAgent implements IStreamClientAgent {
 
         logger.info("going to connect to stream server :{}", streamServerAddress);
         clientBootstrap.connect(streamServerAddress);
+        int port = 1024 + new Random().nextInt(20000);
+        forwarderServerAgent.start(new InetSocketAddress(port));
+        System.out.println("OUR SERVER PORT IZ " + port + " !!!11!!1111oneoneone");
     }
 
     @Override
     public void stop() {
         clientChannel.close();
         clientBootstrap.releaseExternalResources();
+        forwarderServerAgent.stop();
+    }
+
+    @Override
+    public void receiveEncodedFrame(Object frame) {
+        forwarderServerAgent.forwardImage(frame);
     }
 
     protected class StreamClientListenerIMPL implements StreamClientListener {
@@ -115,8 +126,5 @@ public class StreamClientAgent implements IStreamClientAgent {
         public void onException(Channel channel, Throwable t) {
             //	logger.debug("exception at :{},exception :{}",channel,t);
         }
-
-
     }
-
 }

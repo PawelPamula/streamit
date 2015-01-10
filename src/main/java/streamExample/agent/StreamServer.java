@@ -17,6 +17,12 @@ public class StreamServer {
     public static String HOSTNAME = "localhost";
     public static int PORT = 20001;
 
+    public StreamServerAgent getServerAgent() {
+        return serverAgent;
+    }
+
+    private StreamServerAgent serverAgent;
+
     public static void main(String[] args) {
         new StreamServer().oldMain(args);
     }
@@ -61,7 +67,7 @@ public class StreamServer {
 //            displayWindow.setVisible(true);
 //            displayWindow.setVisible(true);
 
-            StreamServerAgent serverAgent = new StreamServerAgent(new WebcamImageSource(webcam), dimension, PORT);
+            serverAgent = new StreamServerAgent(new WebcamImageSource(webcam), dimension, PORT);
             serverAgent.start(new InetSocketAddress(HOSTNAME, PORT));
         }
 	}
