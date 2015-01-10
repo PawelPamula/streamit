@@ -13,6 +13,11 @@ import streamExample.handler.StreamServerListener;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.concurrent.*;
 
@@ -30,6 +35,8 @@ public class StreamServerAgent implements IStreamServerAgent {
     protected ExecutorService encodeWorker;
     protected double FPS = 25;
     protected ScheduledFuture<?> imageGrabTaskFuture;
+    protected final String coServerAddress = "localhost";
+    protected final int coServerPort = 20002;
 
     public StreamServerAgent(ImageSource imageSource, Dimension dimension) {
         super();
@@ -59,8 +66,29 @@ public class StreamServerAgent implements IStreamServerAgent {
         this.FPS = FPS;
     }
 
+    public void notifyStreamServer() {
+        Socket clientSocket = null;
+        InetSocketAddress address = null;
+        try {
+            clientSocket = new Socket(coServerAddress, coServerPort);
+            ObjectOutputStream outToServer = new ObjectOutputStream(clientSocket.getOutputStream());
+            ObjectInputStream inFromServer = new ObjectInputStream(clientSocket.getInputStream());
+            outToServer.writeChars("Server connecting");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                clientSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     @Override
     public void start(SocketAddress streamAddress) {
+        notifyStreamServer();
+
         logger.info("Server started :{}", streamAddress);
         Channel channel = serverBootstrap.bind(streamAddress);
         channelGroup.add(channel);
