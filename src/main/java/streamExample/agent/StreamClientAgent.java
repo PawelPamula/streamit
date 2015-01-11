@@ -1,5 +1,6 @@
 package streamExample.agent;
 
+import javafx.util.Pair;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
@@ -32,7 +33,8 @@ public class StreamClientAgent implements IStreamClientAgent, EncodedFrameListen
     protected Channel clientChannel;
 //    private OnConnectListener callback;
     private ForwarderServerAgent forwarderServerAgent;
-    public int port;
+    private int clientPort;
+    private InetSocketAddress streamServerAddress;
 
     public StreamClientAgent(StreamFrameListener streamFrameListener,
                              Dimension dimension) {
@@ -55,8 +57,8 @@ public class StreamClientAgent implements IStreamClientAgent, EncodedFrameListen
 
         forwarderServerAgent = new ForwarderServerAgent();
 
-        // choose a random port
-        this.port = 1024 + new Random().nextInt(20000);
+        // choose a random clientPort
+        this.clientPort = 1024 + new Random().nextInt(20000);
     }
 
     public InetSocketAddress getStreamServerAddress() {
@@ -67,7 +69,7 @@ public class StreamClientAgent implements IStreamClientAgent, EncodedFrameListen
             ObjectOutputStream outToServer = new ObjectOutputStream(clientSocket.getOutputStream());
             ObjectInputStream inFromServer = new ObjectInputStream(clientSocket.getInputStream());
             String msgType = CoordinationServer.CLIENT_CONNECTING;
-            outToServer.writeObject(new HostData(null, this.port, msgType));
+            outToServer.writeObject(new HostData(null, this.clientPort, msgType));
             address = (InetSocketAddress) inFromServer.readObject();
         } catch (IOException e) {
             e.printStackTrace();
@@ -85,15 +87,20 @@ public class StreamClientAgent implements IStreamClientAgent, EncodedFrameListen
         return address;
     }
 
+
+    public Pair getClientPort() {
+        return new Pair(clientPort, streamServerAddress.getPort());
+    }
+
     @Override
     public void connect(SocketAddress streamServerAddress) {
         // find address to connect to
-        streamServerAddress = getStreamServerAddress();
+        this.streamServerAddress = getStreamServerAddress();
 
-        logger.info("going to connect to stream server :{}", streamServerAddress);
-        clientBootstrap.connect(streamServerAddress);
-        forwarderServerAgent.start(new InetSocketAddress(this.port));
-        System.out.println("OUR SERVER PORT IZ " + this.port + " !!!11!!1111oneoneone");
+        logger.info("going to connect to stream server :{}", this.streamServerAddress);
+        clientBootstrap.connect(this.streamServerAddress);
+        forwarderServerAgent.start(new InetSocketAddress(this.clientPort));
+        System.out.println("OUR SERVER PORT IZ " + this.clientPort + " !!!11!!1111oneoneone");
     }
 
     @Override

@@ -1,11 +1,8 @@
 package streamExample.agent;
 
-import com.github.sarxos.webcam.Webcam;
-import com.github.sarxos.webcam.WebcamPanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import streamExample.agent.ui.WebcamImageSource;
-import streamExample.agent.ui.server.StreamServerWindow;
+import streamExample.agent.ui.DesktopSource;
 
 import javax.swing.*;
 import java.awt.*;
@@ -39,17 +36,26 @@ public class StreamServer {
         } catch (UnsupportedLookAndFeelException e) {
             e.printStackTrace();
         }
-        Webcam.setAutoOpenMode(true);
+
+        //CHOOSING SOURCE
+        Dimension dimension = new Dimension(500, 500);
+        DesktopSource source = new DesktopSource(dimension);
+        serverAgent = new StreamServerAgent(source, dimension, PORT);
+        serverAgent.start(new InetSocketAddress(HOSTNAME, PORT));
+
+
+/*        Webcam.setAutoOpenMode(true);
         logger.debug("Finding webcam");
-		Webcam webcam = Webcam.getDefault();
+        Webcam webcam = Webcam.getDefault();
         logger.debug("Webcam found");
-//        Dimension dimension = webcam.getViewSize();
-        Dimension dimension = new Dimension(320, 240);
+        Dimension dimension = webcam.getViewSize();
+//        Dimension dimension = new Dimension(320, 240);
 //        JFrame displayWindow = new JFrame("Streamit Server");
 //        StreamServerDisplayWindow displayWindow = new StreamServerDisplayWindow("Streamit Server Window", dimension);
         StreamServerWindow displayWindow = new StreamServerWindow();
 //        window.setResizable(true);
 //        window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
         if (webcam == null) {
             JOptionPane.showMessageDialog(displayWindow, "No webcam detected", "Error", JOptionPane.ERROR_MESSAGE);
             System.exit(-1);
@@ -68,8 +74,8 @@ public class StreamServer {
 //            displayWindow.setVisible(true);
 
             serverAgent = new StreamServerAgent(new WebcamImageSource(webcam), dimension, PORT);
-            serverAgent.start(new InetSocketAddress(HOSTNAME, PORT));
-        }
+            serverAgent.start(new InetSocketAddress(HOSTNAME, PORT));*
+        }*/
 	}
 
 }

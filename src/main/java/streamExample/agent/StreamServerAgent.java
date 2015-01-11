@@ -54,7 +54,6 @@ public class StreamServerAgent implements IStreamServerAgent {
         this.streamServerPort = port;
     }
 
-
     public double getFPS() {
         return FPS;
     }

@@ -1,6 +1,7 @@
 package streamExample.agent.ui.client;
 
 
+import javafx.util.Pair;
 import streamExample.agent.ui.components.VideoPanel;
 
 import javax.swing.*;
@@ -51,6 +52,11 @@ public class StreamClientWindow extends JFrame {
         connectionMenu.add(editConnectionMenuItem);
 
         windowContent.menuBar.add(connectionMenu);
+    }
+
+    public void updateInfo(Pair ports) {
+        windowContent.portLabel.setText(String.valueOf(ports.getKey()));
+        windowContent.statusLabel.setText(String.valueOf(ports.getValue()));
     }
 }
 

@@ -15,7 +15,7 @@ public class StreamServerWindowContent {
 
     protected void addVideoPanel(WebcamPanel panel) {
         videoContentPanel.removeAll();
-        videoContentPanel.setLayout(new GridLayout(1,1));
+        videoContentPanel.setLayout(new GridLayout(1, 1));
         videoContentPanel.add(panel);
         videoContentPanel.revalidate();
     }

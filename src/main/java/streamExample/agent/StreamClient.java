@@ -13,7 +13,7 @@ public class StreamClient {
     protected final static Logger logger = LoggerFactory.getLogger(StreamClient.class);
     private final Dimension startDimension = new Dimension(320, 240);
     private StreamClientWindow displayWindow;
-    private static InetSocketAddress streamServerAddress;
+    //private static InetSocketAddress streamServerAddress;
 
     public void oldMain(String[] args) {
         displayWindow = new StreamClientWindow();
@@ -24,6 +24,9 @@ public class StreamClient {
 		// streamServerAddress = clientAgent.getStreamServerAddress();
         // TO NIE JEST ADRES POD KTÓRY SIĘ ŁĄCZYMY!
 		clientAgent.connect(new InetSocketAddress(StreamServer.HOSTNAME, StreamServer.PORT));
+
+        //GUI update
+        displayWindow.updateInfo(clientAgent.getClientPort());
 	}
 
     public static void main(String[] args) {
