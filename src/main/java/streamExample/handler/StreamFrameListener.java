@@ -9,4 +9,6 @@ public interface StreamFrameListener {
      * @param image The received and decoded image
      */
     public void onFrameReceived(BufferedImage image);
+
+    public void onMsgReceived(Object object);
 }

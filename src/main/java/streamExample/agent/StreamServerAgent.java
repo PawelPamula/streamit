@@ -1,6 +1,5 @@
 package streamExample.agent;
 
-import com.github.sarxos.webcam.Webcam;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.group.ChannelGroup;
@@ -9,18 +8,24 @@ import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import streamExample.channel.StreamServerChannelPipelineFactory;
+import streamExample.coserver.CoordinationServer;
 import streamExample.handler.H264StreamEncoder;
 import streamExample.handler.StreamServerListener;
+import streamExample.utils.HostData;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.concurrent.*;
 
 public class StreamServerAgent implements IStreamServerAgent {
-    protected final static Logger logger = LoggerFactory.getLogger(StreamServer.class);
+    protected final static Logger logger = LoggerFactory.getLogger(StreamServerAgent.class);
 
-    protected final Webcam webcam;
+    protected final ImageSource imageSource;
     protected final Dimension dimension;
     protected final ChannelGroup channelGroup = new DefaultChannelGroup();
     protected final ServerBootstrap serverBootstrap;
@@ -31,26 +36,23 @@ public class StreamServerAgent implements IStreamServerAgent {
     protected ExecutorService encodeWorker;
     protected double FPS = 25;
     protected ScheduledFuture<?> imageGrabTaskFuture;
+    protected final int streamServerPort;
 
-    public StreamServerAgent(Webcam webcam, Dimension dimension) {
+    public StreamServerAgent(ImageSource imageSource, Dimension dimension, int port) {
         super();
-        // does not work:
-//        FPS = webcam.getFPS();
-        this.webcam = webcam;
+        this.imageSource = imageSource;
         this.dimension = dimension;
-        //this.h264StreamEncoder = new H264StreamEncoder(dimension,false);
         this.serverBootstrap = new ServerBootstrap();
         this.serverBootstrap.setFactory(new NioServerSocketChannelFactory(
                 Executors.newCachedThreadPool(),
                 Executors.newCachedThreadPool()));
         this.serverBootstrap.setPipelineFactory(new StreamServerChannelPipelineFactory(
-                new StreamServerListenerIMPL(),
-                dimension));
+                new StreamServerListenerIMPL()));
         this.timeWorker = new ScheduledThreadPoolExecutor(1);
         this.encodeWorker = Executors.newSingleThreadExecutor();
         this.h264StreamEncoder = new H264StreamEncoder(dimension, false);
+        this.streamServerPort = port;
     }
-
 
     public double getFPS() {
         return FPS;
@@ -60,8 +62,29 @@ public class StreamServerAgent implements IStreamServerAgent {
         this.FPS = FPS;
     }
 
+    public void notifyStreamServer() {
+        Socket clientSocket = null;
+        InetSocketAddress address = null;
+        try {
+            clientSocket = new Socket(CoordinationServer.COORDINATION_SERVER_HOST, CoordinationServer.COORDINATION_SERVER_PORT);
+            ObjectOutputStream outToServer = new ObjectOutputStream(clientSocket.getOutputStream());
+            String msgType = CoordinationServer.SERVER_CONNECTING;
+            outToServer.writeObject(new HostData(null, streamServerPort, msgType));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                clientSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     @Override
     public void start(SocketAddress streamAddress) {
+        notifyStreamServer();
+
         logger.info("Server started :{}", streamAddress);
         Channel channel = serverBootstrap.bind(streamAddress);
         channelGroup.add(channel);
@@ -82,10 +105,8 @@ public class StreamServerAgent implements IStreamServerAgent {
         @Override
         public void onClientConnectedIn(Channel channel) {
             //here we just start to stream when the first client connected in
-            //
             channelGroup.add(channel);
             if (!isStreaming) {
-                //do some thing
                 Runnable imageGrabTask = new ImageGrabTask();
                 ScheduledFuture<?> imageGrabFuture =
                         timeWorker.scheduleWithFixedDelay(imageGrabTask,
@@ -103,12 +124,6 @@ public class StreamServerAgent implements IStreamServerAgent {
             channelGroup.remove(channel);
             int size = channelGroup.size();
             logger.info("current connected clients :{}", size);
-            if (size == 1) {
-                //cancel the task
-                imageGrabTaskFuture.cancel(false);
-                webcam.close();
-                isStreaming = false;
-            }
         }
 
         @Override
@@ -117,14 +132,6 @@ public class StreamServerAgent implements IStreamServerAgent {
             channel.close();
             int size = channelGroup.size();
             logger.info("current connected clients :{}", size);
-            if (size == 1) {
-                //cancel the task
-                imageGrabTaskFuture.cancel(false);
-                webcam.close();
-                isStreaming = false;
-
-            }
-
         }
 
         protected volatile long frameCount = 0;
@@ -134,14 +141,7 @@ public class StreamServerAgent implements IStreamServerAgent {
             @Override
             public void run() {
                 logger.info("image grabed ,count :{}", frameCount++);
-                BufferedImage bufferedImage = webcam.getImage();
-                /**
-                 * using this when the h264 encoder is added to the pipeline
-                 * */
-                //channelGroup.write(bufferedImage);
-                /**
-                 * using this when the h264 encoder is inside this class
-                 * */
+                BufferedImage bufferedImage = imageSource.getImage();
                 encodeWorker.execute(new EncodeTask(bufferedImage));
             }
 

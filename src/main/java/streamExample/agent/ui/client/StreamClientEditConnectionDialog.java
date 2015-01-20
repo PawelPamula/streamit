@@ -1,4 +1,4 @@
-package streamExample.agent.ui;
+package streamExample.agent.ui.client;
 
 import javax.swing.*;
 import java.awt.event.*;
@@ -54,7 +54,7 @@ public class StreamClientEditConnectionDialog extends JDialog {
         dispose();
     }
 
-//    public static void main(String[] args) {
+//    public static void oldMain(String[] args) {
 //        StreamClientEditConnectionDialog dialog = new StreamClientEditConnectionDialog();
 //        dialog.pack();
 //        dialog.setVisible(true);

@@ -1,4 +1,6 @@
-package streamExample.agent.ui;
+package streamExample.agent.ui.client;
+
+import streamExample.agent.ui.components.VideoPanel;
 
 import javax.swing.*;
 import java.awt.*;
